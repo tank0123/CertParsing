@@ -12,9 +12,19 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 // 지정된 URL을 통해 파일을 다운받는 클래스
 public class GetFileFromURLWithProxy {
+	private String proxyIp[] = new String[10];
+	private String proxyPort[] = new String[10];
+	private int index = 0;
+	private int code = 0;
+	
 	Random ran = new Random();
 	final static int size = 1024;
 
@@ -62,7 +72,7 @@ public class GetFileFromURLWithProxy {
 		InputStream is = null;
 		HttpURLConnection huc = null;
 
-		int code = 0;
+		
 
 		try {
 			URL Url;
@@ -73,7 +83,9 @@ public class GetFileFromURLWithProxy {
 			Url = new URL(fileAddress);
 			
 			do {
-				setProxy();
+				if(code != 200) {
+					setProxy();
+				}
 				huc = (HttpURLConnection) Url.openConnection();
 				huc.setRequestMethod("GET"); // OR huc.setRequestMethod ("HEAD");
 				huc.connect();
@@ -106,18 +118,50 @@ public class GetFileFromURLWithProxy {
 	}
 
 	private void setProxy() {
-
-		String proxyIpList[] = { "35.236.37.114", "31.47.189.14", "118.172.201.27", "93.91.218.72" };
-		String proxyPortList[] = { "8080", "38473", "59332", "46292" };
-
-		int index = ran.nextInt(4);
-		
+		// https://free-proxy-list.net/
+		if(index <= 10) {
+			getHTMLSource();
+			index = 0;
+		}
 		System.out.println("changing proxy : "+index);
 
 		try {
-			System.setProperty("http.proxyHost", proxyIpList[index]);
-			System.setProperty("http.proxyPort", proxyPortList[index]);
+			System.setProperty("http.proxyHost", proxyIp[index]);
+			System.setProperty("http.proxyPort", proxyPort[index]);
+			index++;
 
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
+	
+	// Get Free Proxy information from https://free-proxy-list.net/
+	private void getHTMLSource() {
+		int i = 0;
+		try {
+			String urlStr = "https://free-proxy-list.net/";
+			
+			Document doc = Jsoup.connect(urlStr).get();
+			
+			
+			Pattern ipPattern = Pattern.compile("(([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))");
+			Pattern portPattern = Pattern.compile(">[0-9]{1,5}<");
+					
+			Matcher ipMatcher = ipPattern.matcher(doc.toString());
+			Matcher portMatcher = portPattern.matcher(doc.toString());
+			
+			while (ipMatcher.find() && (i < 10)) {
+				proxyIp[i++] = ipMatcher.group();
+			}
+			
+			i = 0;
+			while (portMatcher.find() && (i < 10)) {
+				proxyPort[i] = portMatcher.group();
+				proxyPort[i] = proxyPort[i].substring(1, proxyPort[i].length()-1);
+				i++;
+			}
+			
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
