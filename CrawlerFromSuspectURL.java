@@ -18,6 +18,8 @@ public class CrawlerFromSuspectURL {
 	private void getHTMLSourceFlock() {
 		try {
 			String urlStr = "http://fl0ckfl0ck.work/cert";
+			
+			
 
 			/*
 			 * GET HTML DATA 1. org.jsoup.Connection.Response response =

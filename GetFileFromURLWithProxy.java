@@ -54,7 +54,7 @@ public class GetFileFromURLWithProxy {
 				// 자른 문자열의 첫번째 값인 아이피주소와 URL주소를 결합하여 다운 링크 완성
 				String Buf = "http://fl0ckfl0ck.work/cert/" + tabSplit[0];
 				// 완성된 다운 링크와 파일이름, 파일 다운 경로로 입력받을 값을 각각 인자로 넣어 파일 다운 메서드 호출
-				fileUrlReadAndDownload(Buf, tabSplit[0], "C://BoBTest//Proxy");
+				fileUrlReadAndDownload(Buf, tabSplit[0], "C://BoBTest//CertDown");
 			}
 			System.out.println("It's Done!!");
 			bfr.close();
